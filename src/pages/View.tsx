@@ -4,10 +4,11 @@ import StockSummaryList from '../components/list/StockSummaryList';
 
 type Props = {
     setExplainId: React.Dispatch<React.SetStateAction<string>>;
+    setCode: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const View = (props: Props) => {
-    const { setExplainId } = props;
+    const { setExplainId, setCode } = props;
     const [input, setInput] = useState(""); // Initializing input state
 
     const handleInputChange = (event: any) => {
@@ -35,7 +36,7 @@ const View = (props: Props) => {
                 {/* <StockChart code={input}/> */}
             </Box>
             <Box width={'100%'}>
-                <StockSummaryList code={input} setExplainId={setExplainId} />
+                <StockSummaryList code={input} setExplainId={setExplainId} setCode={setCode} />
             </Box>
         </VStack>
     )

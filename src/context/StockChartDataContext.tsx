@@ -63,8 +63,6 @@ export const StockChartDataProvider: FC<Props> = ({ children }) => {
     useEffect(() => {
         if (!params.equals(new StockChartParams())) {
             FetchData(params);
-        } else {
-            console.log("equals");
         }
     }, [params, FetchData])
 

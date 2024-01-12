@@ -12,11 +12,17 @@ import { Link } from 'react-router-dom';
 type Props = {
   code: string;
   setExplainId: React.Dispatch<React.SetStateAction<string>>;
+  setCode: React.Dispatch<React.SetStateAction<string>>;
 };
 
 const StockSummaryList = (props: Props) => {
-  const { code, setExplainId } = props;
+  const { code, setExplainId, setCode } = props;
   const [data, setData] = useState<ExplainListDataItem[]>([]);
+
+  const hundleClick = (item: ExplainListDataItem) => {
+    setExplainId(item.id);
+    setCode(item.code);
+  }
 
   useEffect(() => {
     if (code !== "" && code.length === 4) {
@@ -37,42 +43,44 @@ const StockSummaryList = (props: Props) => {
 
   return (
     <Box>
-      {data.length > 0 ? ( // Added conditional check to render UnorderedList only if data is not empty
-        <Box
-          borderRadius='8px'
-          border='1px'
-          borderColor='gray.300'
-          padding='0.75rem'
-        >
-          <UnorderedList listStyleType={'none'}>
-            {data.map(item => (
-              <Link to={'/financialstate'}>
-                <ListItem
-                  key={item.index_id}
-                  borderBottom={'1px'}
-                  borderBottomColor={'gray.400'}
-                  padding={2}
-                  color={'gray.500'}
-                  _hover={{ color: 'black' }}
-                  onClick={() => setExplainId(item.id)}
-                >
-                  <VStack>
-                    <Text>
-                      {item.publication_date}
-                    </Text>
-                    <Text>
-                      {item.company_name}
-                    </Text>
-                    <Text>
-                      {item.document_title}
-                    </Text>
-                  </VStack>
-                </ListItem>
-              </Link>
-            ))}
-          </UnorderedList>
-        </Box>
-      ) : null}
+      {data ? (
+        data.length > 0 ? ( // Added conditional check to render UnorderedList only if data is not empty
+          <Box
+            borderRadius='8px'
+            border='1px'
+            borderColor='gray.300'
+            padding='0.75rem'
+          >
+            <UnorderedList listStyleType={'none'}>
+              {data.map(item => (
+                <Link to={'/financialstate'}>
+                  <ListItem
+                    key={item.index_id}
+                    borderBottom={'1px'}
+                    borderBottomColor={'gray.400'}
+                    padding={2}
+                    color={'gray.500'}
+                    _hover={{ color: 'black' }}
+                    onClick={() => hundleClick(item)}
+                  >
+                    <VStack>
+                      <Text>
+                        {item.publication_date}
+                      </Text>
+                      <Text>
+                        {item.company_name}
+                      </Text>
+                      <Text>
+                        {item.document_title}
+                      </Text>
+                    </VStack>
+                  </ListItem>
+                </Link>
+              ))}
+            </UnorderedList>
+          </Box>
+        ) : null
+      ) : null};
     </Box>
   );
 };

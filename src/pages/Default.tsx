@@ -4,12 +4,15 @@ import MainHeader from '../components/headers/MainHeader';
 import { Route, Routes } from 'react-router-dom';
 import Home from './Home';
 import View from './View';
-import FinancialState from './FinancialState';
+import FinancialStateView from './FinancialStateView';
 
 type Props = {}
 
 const Default = (props: Props) => {
     const [explainId, setExplainId] = useState<string>("");
+    const [code, setCode] = useState<string>("");
+    const [industry, setIndustry] = useState<string>("");
+
     return (
         <Stack direction={'column'}>
             <Flex
@@ -29,8 +32,8 @@ const Default = (props: Props) => {
             <Box as='main'>
                 <Routes>
                     <Route path='/' element={<Home />} />
-                    <Route path='/view' element={<View setExplainId={setExplainId} />} />
-                    <Route path='/financialstate' element={<FinancialState explainId={explainId} />} />
+                    <Route path='/view' element={<View setExplainId={setExplainId} setCode={setCode} />} />
+                    <Route path='/financialstate' element={<FinancialStateView explainId={explainId} code={code} industry={industry} setIndustry={setIndustry} />} />
                 </Routes>
             </Box>
         </Stack>

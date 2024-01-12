@@ -203,7 +203,7 @@ interface ExplainItemParamsInterface {
     calLinkNull: string;
     calLinkOrder: string;
     code: string;
-    current_context:boolean;
+    current_context: boolean;
     defLinkFromElement: string;
     defLinkOrder: string;
     doc_element: string;
@@ -224,7 +224,7 @@ export class ExplainItemParams implements ExplainItemParamsInterface {
     calLinkNull: string = '';
     calLinkOrder: string = '';
     code: string = '';
-    current_context:boolean = false;
+    current_context: boolean = false;
     defLinkFromElement: string = '';
     defLinkOrder: string = '';
     doc_element: string = '';
@@ -248,7 +248,7 @@ export class ExplainItemParams implements ExplainItemParamsInterface {
             calLinkNull: this.calLinkNull,
             calLinkOrder: this.calLinkOrder,
             code: this.code,
-            current_context:this.current_context,
+            current_context: this.current_context,
             defLinkFromElement: this.defLinkFromElement,
             defLinkOrder: this.defLinkOrder,
             doc_element: this.doc_element,
@@ -429,6 +429,19 @@ export class StockBrandsParams implements StockBrandsParamsInterface {
         );
     }
 }
+
+export type StockBrandsData = {
+    id: string;
+    code: string;
+    security_name: string;
+    market_product_category: string;
+    number_33_industry_code: string;
+    number_33_industry_category: string;
+    number_17_industry_code: string;
+    number_17_industry_category: string;
+    scale_code: number;
+    scale_category: string;
+};
 
 /**
  * brands APIを呼び出す関数
