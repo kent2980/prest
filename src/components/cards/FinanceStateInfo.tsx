@@ -54,7 +54,7 @@ const FinancialStateInfo = (props: Props) => {
     return (
         <VStack>
             {items ?
-                <StatGroup w={'500px'} border={'1px'} borderColor={'gray.300'} borderRadius={'10px'} padding={'10px'} >
+                <StatGroup w={{ base: 'calc(100vw - 10vw)', sm: '500px' }} border={'1px'} borderColor={'gray.300'} borderRadius={'10px'} padding={'10px'} >
                     <Stat>
                         <StatLabel>売上高</StatLabel>
                         <StatNumber>{parseInt(getItem(items, ElementLabel.売上高, UnitRef.JPY)?.numeric ?? "").toLocaleString()}</StatNumber>
