@@ -32,7 +32,7 @@ const Default = (props: Props) => {
             </Flex>
             <Box as='main'>
                 <Routes>
-                    <Route path='/' element={<Home />} />
+                    <Route path='/' element={<Home setCode={setCode} />} />
                     <Route path='/view' element={<View code={code} setExplainId={setExplainId} setCode={setCode} setConsolidationCat={setConsolidationCat} />} />
                     <Route path='/financialstate' element={<FinancialStateView explainId={explainId} code={code} industry={industry} setIndustry={setIndustry} consolidationCat={consolidationCat} />} />
                 </Routes>
