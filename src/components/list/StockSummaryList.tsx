@@ -53,7 +53,11 @@ const StockSummaryList = (props: Props) => {
   }
 
   useEffect(() => {
-    allRecord();
+    if (code !== "" && code.length === 4) {
+      selectCodeRecord(code);
+    } else if (code.length < 4) {
+      allRecord();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

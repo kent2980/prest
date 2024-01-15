@@ -4,13 +4,14 @@ import StockSummaryList from '../components/list/StockSummaryList';
 
 type Props = {
     setExplainId: React.Dispatch<React.SetStateAction<string>>;
+    code: string;
     setCode: React.Dispatch<React.SetStateAction<string>>;
     setConsolidationCat: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const View = (props: Props) => {
-    const { setExplainId, setCode, setConsolidationCat } = props;
-    const [input, setInput] = useState(""); // Initializing input state
+    const { setExplainId, setCode, setConsolidationCat, code } = props;
+    const [input, setInput] = useState(code); // Initializing input state
 
     const handleInputChange = (event: any) => {
         setInput(event.target.value); // Updating the input state with the entered value

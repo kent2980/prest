@@ -33,7 +33,7 @@ const Default = (props: Props) => {
             <Box as='main'>
                 <Routes>
                     <Route path='/' element={<Home />} />
-                    <Route path='/view' element={<View setExplainId={setExplainId} setCode={setCode} setConsolidationCat={setConsolidationCat} />} />
+                    <Route path='/view' element={<View code={code} setExplainId={setExplainId} setCode={setCode} setConsolidationCat={setConsolidationCat} />} />
                     <Route path='/financialstate' element={<FinancialStateView explainId={explainId} code={code} industry={industry} setIndustry={setIndustry} consolidationCat={consolidationCat} />} />
                 </Routes>
             </Box>
