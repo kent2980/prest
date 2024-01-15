@@ -23,14 +23,14 @@ const StockSummary = (props: Props) => {
     if (code !== "" && code.length === 4) {
       const list = new ExplainList();
       list.code = code;
-      ExplainListApi.fetchData(list)
+      ExplainListApi.fetchData(list, true)
         .then(res => {
           setData(res);
           console.log(data);
         })
         .catch(error => console.log(error));
     }
-    else{
+    else {
       setData([]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

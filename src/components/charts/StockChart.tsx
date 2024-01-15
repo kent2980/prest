@@ -18,7 +18,7 @@ const StockChart = (props: Props) => {
         if (code !== "" && code.length === 4) {
             const list = new StockChartParams();
             list.code = code;
-            StockChartDataApi.fetchData(list)
+            StockChartDataApi.fetchData(list, true)
                 .then(res => {
                     setData(res);
                     console.log(list);

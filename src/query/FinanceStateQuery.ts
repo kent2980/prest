@@ -1,8 +1,8 @@
 import { ExplainItemDataItem } from "../services/FsstockApiServies"
 
 export enum ContextMember {
-    RESULT_MEMBER = "ResultMember",
-    FORECAST_MEMBER = "ForecastMember"
+    RESULT_MEMBER = "_ResultMember",
+    FORECAST_MEMBER = "_ForecastMember"
 }
 
 export enum ContextScale {
@@ -13,7 +13,9 @@ export enum ContextScale {
 export enum UnitRef {
     JPY = "JPY",
     PURE = "Pure",
-    SHARES = "Shares"
+    SHARES = "Shares",
+    JPYPERSHARES = "JPYPerShares",
+    NUMBEROFCOMPANIES = "NumberOfCompanies"
 }
 
 export enum ReportDetailCat {
@@ -36,141 +38,291 @@ export enum ElementLabel {
     自己資本比率 = "CapitalAdequacyRatio"
 }
 
+export enum ConsolidatedMember {
+    連結 = "_ConsolidatedMember",
+    非連結 = "_NonConsolidatedMember"
+}
+
+/**
+ * ExplainItemDataItem配列からアイテムを抽出する機能を定義した基底クラスです。
+ */
 export class FinanceStateQueryBase {
-    private states: ExplainItemDataItem[];
-    private contextMember: string = "";
-    private contextScale: string = "";
-    private elements: string[] = [];
-    private unitref: string = "";
-    private reportDetailCate: string = "";
+    private _states: ExplainItemDataItem[];
+    private _contextMember: string = "";
+    private _contextScale: string = "";
+    private _elements: string[] = [];
+    private _unitref: string = "";
+    private _reportDetailCate: string = "";
+    private _consolidatedMember: string = "";
 
     constructor(states: ExplainItemDataItem[]) {
-        this.states = states;
+        this._states = states;
     }
 
-    public getItem(): ExplainItemDataItem[] {
+    get item(): ExplainItemDataItem[] {
         const states = this.states.filter(item => item.context.includes(this.contextMember))
             .filter(item => item.context.includes(this.contextScale))
             .filter(item => this.elements.includes(item.element))
             .filter(item => item.unitref.includes(this.unitref))
+            .filter(item => item.context.includes(this.consolidatedMember))
         return states;
     }
 
     public setContextMenber(contextMember: ContextMember): this {
-        this.contextMember = contextMember;
+        this._contextMember = contextMember;
         return this;
     }
 
     public setContextScale(contextScale: ContextScale): this {
-        this.contextScale = contextScale;
+        this._contextScale = contextScale;
         return this;
     }
 
     public setElements(elements: string[]): this {
-        this.elements = elements;
+        this._elements = elements;
         return this;
     }
 
     public setUnitref(unitref: UnitRef): this {
-        this.unitref = unitref;
+        this._unitref = unitref;
         return this;
     }
 
     public setReportDetailCat(reportDetailCat: ReportDetailCat): this {
-        this.reportDetailCate = reportDetailCat;
+        this._reportDetailCate = reportDetailCat;
         return this;
     }
 
-    public setElementLabel(label: ElementLabel): this {
+    public setConsolidatedMember(consolidateMember: string): this {
+        switch (consolidateMember) {
+            case "c":
+                this._consolidatedMember = ConsolidatedMember.連結;
+                break;
+            case "n":
+                this._consolidatedMember = ConsolidatedMember.非連結;
+                break;
+            case "連結":
+                this._consolidatedMember = ConsolidatedMember.連結;
+                break;
+            case "非連結":
+                this._consolidatedMember = ConsolidatedMember.非連結;
+                break;
+
+            default:
+                break;
+        }
         return this;
     }
 
+    get states(): ExplainItemDataItem[] {
+        return this._states;
+    }
+
+    get contextMember(): string {
+        return this._contextMember;
+    }
+
+    get contextScale(): string {
+        return this._contextScale;
+    }
+
+    get elements(): string[] {
+        return this._elements;
+    }
+
+    get unitref(): string {
+        return this._unitref;
+    }
+
+    get reportDetailCate(): string {
+        return this._reportDetailCate;
+    }
+
+    get consolidatedMember(): string {
+        return this._consolidatedMember;
+    }
 }
+
+/**
+ * ExplainItemDataItem配列からアイテムを抽出するクラスです。
+ * 一般企業に対応したクラスです。
+ */
 export class FinanceStateQuery extends FinanceStateQueryBase {
+
+    /**
+     * 売上高に対応するコンテキスト
+     */
+    protected salesContext: string[] = [
+        'OperatingRevenues',
+        'NetSales',
+        'SalesIFRS',
+        'NetSalesIFRS',
+        'NetSalesUS',
+        'RevenueIFRS',
+        'TotalRevenuesUS'
+    ];
+
+    /**
+     * 売上高変化率に対応するコンテキスト
+     */
+    protected changeInSalesContext: string[] = [
+        'ChangeInOperatingRevenues',
+        'ChangeInNetSales',
+        'ChangeInNetSalesIFRS',
+        'ChangeInSalesIFRS',
+        'ChangeInNetSalesUS',
+        'ChangeInRevenueIFRS',
+        'ChangeInTotalRevenuesUS'
+    ];
+
+    /**
+     * 営業利益に対応するコンテキスト
+     */
+    protected operatingIncomeContext: string[] = [
+        "OperatingIncome",
+        'OperatingIncomeIFRS'
+    ];
+
+    /**
+     * 営業利益変化率に対応するコンテキスト
+     */
+    protected changeInIncomeContext: string[] = [
+        'ChangeInOperatingIncome',
+        'ChangeInOperatingIncomeIFRS',
+    ];
+
+    /**
+     * 経常利益に対応するコンテキスト
+     */
+    protected ordinaryIncomeContext: string[] = [
+        "OrdinaryIncome",
+        'ProfitBeforeTaxIFRS'
+    ];
+
+    /**
+     * 経常利益変化率に対応するコンテキスト
+     */
+    protected changeInOrdinaryIncomeContext: string[] = [
+        'ChangeInOrdinaryIncome',
+        'ChangeInOrdinaryIncomeIFRS',
+        'ChangeInProfitBeforeTaxIFRS'
+    ];
+
+    /**
+     * EPS(1株利益)に対応するコンテキスト
+     */
+    protected netIncomePerShareContext: string[] = [
+        'NetIncomePerShare',
+        'NetIncomePerShareIFRS'
+    ];
+
+    /**
+     * 純利益に対応するコンテキスト
+     */
+    protected netIncomeContext: string[] = [
+        'NetIncome',
+        'ProfitAttributableToOwnersOfParent',
+        'ProfitAttributableToOwnersOfParentIFRS'
+    ];
+
+    /**
+     * 純利益変化率に対応するコンテキスト
+     */
+    protected changeInNetIncomeContext: string[] = [
+        'ChangeInNetIncome',
+        'ChangeInProfitAttributableToOwnersOfParent',
+        'ChangeInProfitAttributableToOwnersOfParentIFRS',
+    ];
+
+    /**
+     * 純資産に対応するコンテキスト
+     */
+    protected netAssetsContext: string[] = [
+        'NetAssets',
+        'NetAssetsIFRS'
+    ];
+
+    /**
+     * 総資産に対応するコンテキスト
+     */
+    protected totalAssetsContext: string[] = [
+        'TotalAssets',
+        'TotalAssetsIFRS'
+    ];
+
+    /**
+     * 自己資本比率に対応するコンテキスト
+     */
+    protected capitalAdequacyRatioContext: string[] = [
+        'CapitalAdequacyRatio',
+        'CapitalAdequacyRatioIFRS'
+    ];
+
+    /**
+     * エレメントラベルを設定し、アイテムを抽出します。
+     * @param label elementLabel
+     * @returns this
+     */
     public setElementLabel(label: ElementLabel): this {
         switch (label) {
             case ElementLabel.売上高:
-                this.setElements([
-                    'OperatingRevenues',
-                    'NetSales',
-                    'SalesIFRS',
-                    'NetSalesUS',
-                    'RevenueIFRS',
-                    'TotalRevenuesUS'
-                ])
+                this.setElements(this.salesContext)
+                this.setUnitref(UnitRef.JPY);
                 break;
 
             case ElementLabel.売上高変化率:
-                this.setElements([
-                    'ChangeInOperatingRevenues',
-                    'ChangeInNetSales',
-                    'ChangeInSalesIFRS',
-                    'ChangeInNetSalesUS',
-                    'ChangeInRevenueIFRS',
-                    'ChangeInTotalRevenuesUS'
-                ]);
+                this.setElements(this.changeInSalesContext);
+                this.setUnitref(UnitRef.PURE);
                 break;
 
             case ElementLabel.営業利益:
-                this.setElements([
-                    "OperatingIncome"
-                ])
+                this.setElements(this.operatingIncomeContext)
+                this.setUnitref(UnitRef.JPY);
                 break;
 
             case ElementLabel.営業利益変化率:
-                this.setElements([
-                    'ChangeInOperatingIncome'
-                ])
+                this.setElements(this.changeInIncomeContext)
+                this.setUnitref(UnitRef.PURE);
                 break;
 
             case ElementLabel.経常利益:
-                this.setElements([
-                    "OrdinaryIncome"
-                ])
+                this.setElements(this.ordinaryIncomeContext)
+                this.setUnitref(UnitRef.JPY);
                 break;
 
             case ElementLabel.経常利益変化率:
-                this.setElements([
-                    'ChangeInOrdinaryIncome'
-                ])
+                this.setElements(this.changeInOrdinaryIncomeContext)
+                this.setUnitref(UnitRef.PURE);
                 break;
 
             case ElementLabel.EPS:
-                this.setElements([
-                    'NetIncomePerShare'
-                ])
+                this.setElements(this.netIncomePerShareContext)
+                this.setUnitref(UnitRef.JPY);
                 break;
 
             case ElementLabel.純利益:
-                this.setElements([
-                    'NetIncome',
-                    'ProfitAttributableToOwnersOfParent'
-                ])
+                this.setElements(this.netIncomeContext)
+                this.setUnitref(UnitRef.JPY);
                 break;
 
             case ElementLabel.純利益変化率:
-                this.setElements([
-                    'ChangeInNetIncome',
-                    'ChangeInProfitAttributableToOwnersOfParent'
-                ])
+                this.setElements(this.changeInNetIncomeContext)
+                this.setUnitref(UnitRef.PURE);
                 break;
 
             case ElementLabel.純資産:
-                this.setElements([
-                    'NetAssets'
-                ])
+                this.setElements(this.netAssetsContext)
+                this.setUnitref(UnitRef.JPY);
                 break;
 
             case ElementLabel.総資産:
-                this.setElements([
-                    'TotalAssets'
-                ])
+                this.setElements(this.totalAssetsContext)
+                this.setUnitref(UnitRef.JPY);
                 break
 
             case ElementLabel.自己資本比率:
-                this.setElements([
-                    'CapitalAdequacyRatio'
-                ])
+                this.setElements(this.capitalAdequacyRatioContext)
+                this.setUnitref(UnitRef.PURE);
                 break;
 
             default:
@@ -180,164 +332,26 @@ export class FinanceStateQuery extends FinanceStateQueryBase {
     }
 }
 
-export class FinanceStateQueryBK extends FinanceStateQueryBase {
-    public setElementLabel(label: ElementLabel): this {
-        switch (label) {
-            case ElementLabel.売上高:
-                this.setElements([
-                    'OrdinaryRevenuesBK'
-                ])
-                break;
+/**
+ * ExplainItemDataItem配列からアイテムを抽出するクラスです。
+ * 銀行業に対応したクラスです。
+ */
+export class FinanceStateQueryBK extends FinanceStateQuery {
+    /**
+     * 銀行業に対応する売上高のコンテキスト
+     */
+    protected salesContext: string[] = ['OrdinaryRevenuesBK'];
 
-            case ElementLabel.売上高変化率:
-                this.setElements([
-                    'ChangeInOrdinaryRevenuesBK'
-                ]);
-                break;
-
-            case ElementLabel.経常利益:
-                this.setElements([
-                    "OrdinaryIncome"
-                ])
-                break;
-
-            case ElementLabel.経常利益変化率:
-                this.setElements([
-                    'ChangeInOrdinaryIncome'
-                ])
-                break;
-
-            case ElementLabel.EPS:
-                this.setElements([
-                    'NetIncomePerShare'
-                ])
-                break;
-
-            case ElementLabel.純利益:
-                this.setElements([
-                    'ProfitAttributableToOwnersOfParent'
-                ])
-                break;
-
-            case ElementLabel.純利益変化率:
-                this.setElements([
-                    'ChangeInProfitAttributableToOwnersOfParent'
-                ])
-                break;
-
-            case ElementLabel.純資産:
-                this.setElements([
-                    'NetAssets'
-                ])
-                break;
-
-            case ElementLabel.総資産:
-                this.setElements([
-                    'TotalAssets'
-                ])
-                break
-
-            case ElementLabel.自己資本比率:
-                this.setElements([
-                    'CapitalAdequacyRatio'
-                ])
-                break;
-
-            default:
-                break;
-        }
-        return this;
-    }
+    /**
+     * 銀行業に対応する売上高変化率のコンテキスト
+     */
+    protected changeInSalesContext: string[] = ['ChangeInOrdinaryRevenuesBK'];
 }
 
+
+/**
+ * ExplainItemDataItem配列からアイテムを抽出するクラスです。
+ * 不動産業に対応したクラスです。
+ */
 export class FinanceStateQueryIR extends FinanceStateQuery {
-    public setElementLabel(label: ElementLabel): this {
-        switch (label) {
-            case ElementLabel.売上高:
-                this.setElements([
-                    'OperatingRevenues',
-                    'NetSales',
-                    'SalesIFRS',
-                    'NetSalesUS',
-                    'RevenueIFRS',
-                    'TotalRevenuesUS'
-                ])
-                break;
-
-            case ElementLabel.売上高変化率:
-                this.setElements([
-                    'ChangeInOperatingRevenues',
-                    'ChangeInNetSales',
-                    'ChangeInSalesIFRS',
-                    'ChangeInNetSalesUS',
-                    'ChangeInRevenueIFRS',
-                    'ChangeInTotalRevenuesUS'
-                ]);
-                break;
-
-            case ElementLabel.営業利益:
-                this.setElements([
-                    "OperatingIncome"
-                ])
-                break;
-
-            case ElementLabel.営業利益変化率:
-                this.setElements([
-                    'ChangeInOperatingIncome'
-                ])
-                break;
-
-            case ElementLabel.経常利益:
-                this.setElements([
-                    "OrdinaryIncome"
-                ])
-                break;
-
-            case ElementLabel.経常利益変化率:
-                this.setElements([
-                    'ChangeInOrdinaryIncome'
-                ])
-                break;
-
-            case ElementLabel.EPS:
-                this.setElements([
-                    'NetIncomePerShare'
-                ])
-                break;
-
-            case ElementLabel.純利益:
-                this.setElements([
-                    'ProfitAttributableToOwnersOfParent'
-                ])
-                break;
-
-            case ElementLabel.純利益変化率:
-                this.setElements([
-                    'ChangeInProfitAttributableToOwnersOfParent'
-                ])
-                break;
-
-            case ElementLabel.純資産:
-                this.setElements([
-                    'NetAssets'
-                ])
-                break;
-
-            case ElementLabel.総資産:
-                this.setElements([
-                    'TotalAssets'
-                ])
-                break
-
-            case ElementLabel.自己資本比率:
-                this.setElements([
-                    'CapitalAdequacyRatio'
-                ])
-                break;
-
-            default:
-                break;
-        }
-        return this;
-    }
 }

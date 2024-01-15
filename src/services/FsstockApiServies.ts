@@ -10,7 +10,7 @@ const baseURL: string = 'https://api.fs-stock.net/xbrl/';
  * @returns APIのレスポンスのデータ
  * @throws {Error} - APIリクエストに失敗した場合にスローされるエラー
  */
-const callApi = async (path: string, params: Record<string, any>): Promise<any> => {
+const callApi = async (path: string, params: Record<string, any>, allRecord: boolean): Promise<any> => {
     try {
         // サブディレクトリのパスを作成
         const url: string = `${baseURL}${path}`;
@@ -23,6 +23,7 @@ const callApi = async (path: string, params: Record<string, any>): Promise<any> 
         // APIにリクエストを送信
         let requestUrl: string = `${url}?${queryParams}`;
         let resultsData: any[] = [];
+
         while (requestUrl) {
             console.log(requestUrl)
             const response = await axios.get(requestUrl);
@@ -36,7 +37,11 @@ const callApi = async (path: string, params: Record<string, any>): Promise<any> 
             } else {
                 throw new Error('APIからデータが取得できませんでした')
             }
-            requestUrl = apiData.next;
+            if (allRecord) {
+                requestUrl = apiData.next;
+            } else {
+                requestUrl = "";
+            }
         }
         return resultsData;
     } catch (error) {
@@ -106,6 +111,12 @@ export interface ExplainListParamsInterface {
      * @type {string}
      */
     ordering: string;
+
+    /**
+     * ページ番号
+     * @type {number}
+     */
+    page: number;
 }
 
 export class ExplainList implements ExplainListParamsInterface {
@@ -120,6 +131,7 @@ export class ExplainList implements ExplainListParamsInterface {
     index_id_gt: string = "";
     index_id_lte: string = "";
     ordering: string = "";
+    page: number = 1;
 
     /**
      * パラメータオブジェクトを取得します。
@@ -136,7 +148,8 @@ export class ExplainList implements ExplainListParamsInterface {
             period_year: this.period_year,
             index_id_gt: this.index_id_gt,
             index_id_lte: this.index_id_lte,
-            ordering: this.ordering
+            ordering: this.ordering,
+            page: this.page
         }
     }
 
@@ -156,7 +169,8 @@ export class ExplainList implements ExplainListParamsInterface {
             this.period_year === other.period_year &&
             this.index_id_gt === other.index_id_gt &&
             this.index_id_lte === other.index_id_lte &&
-            this.ordering === other.ordering
+            this.ordering === other.ordering &&
+            this.page === other.page
         );
     }
 }
@@ -173,8 +187,8 @@ export const ExplainListApi = {
      * @param params - クエリパラメータのオブジェクト
      * @returns explain APIのレスポンスのデータ
      */
-    fetchData: async (params: ExplainListParamsInterface): Promise<any> => {
-        return await callApi('explain', params);
+    fetchData: async (params: ExplainListParamsInterface, allRecord: boolean): Promise<any> => {
+        return await callApi('explain', params, allRecord);
     },
 };
 
@@ -308,8 +322,8 @@ export const ExplainItemApi = {
      * @param params - クエリパラメータのオブジェクト
      * @returns item APIのレスポンスのデータ
      */
-    fetchData: async (params: ExplainItemParamsInterface): Promise<any> => {
-        return await callApi('item', params);
+    fetchData: async (params: ExplainItemParamsInterface, allRecord: boolean): Promise<any> => {
+        return await callApi('item', params, allRecord);
     },
 };
 
@@ -454,8 +468,8 @@ export const StockBrandsApi = {
      * @param params - クエリパラメータのオブジェクト
      * @returns brands APIのレスポンスのデータ
      */
-    fetchData: async (params: StockBrandsParamsInterface): Promise<any> => {
-        return await callApi('brands', params);
+    fetchData: async (params: StockBrandsParamsInterface, allRecord: boolean): Promise<any> => {
+        return await callApi('brands', params, allRecord);
     },
 };
 
@@ -541,8 +555,8 @@ export const StockChartDataApi = {
      * @param params - クエリパラメータのオブジェクト
      * @returns result APIのレスポンスのデータ
      */
-    fetchData: async (params: StockChartParamsInterface): Promise<any> => {
-        return await callApi('result', params);
+    fetchData: async (params: StockChartParamsInterface, allRecord: boolean): Promise<any> => {
+        return await callApi('result', params, allRecord);
     },
 };
 

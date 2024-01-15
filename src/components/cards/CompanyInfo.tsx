@@ -18,7 +18,7 @@ const CompanyInfo = (props: Props) => {
             const list = new StockBrandsParams();
             list.code = code;
             // APIから銘柄情報を取得
-            StockBrandsApi.fetchData(list)
+            StockBrandsApi.fetchData(list, true)
                 .then(res => {
                     setItem(res[0]);
                 })
@@ -37,7 +37,8 @@ const CompanyInfo = (props: Props) => {
             {item ? (
                 <VStack>
                     <Text>{item.security_name}</Text >
-                    <Text>{item.number_33_industry_code}</Text>
+                    <Text>銘柄コード:{item.code}</Text>
+                    <Text>業種コード:{item.number_33_industry_code}</Text>
                     <Text>{item.number_33_industry_category}</Text>
                 </VStack>
             ) : null}

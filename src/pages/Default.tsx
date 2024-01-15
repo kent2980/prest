@@ -12,6 +12,7 @@ const Default = (props: Props) => {
     const [explainId, setExplainId] = useState<string>("");
     const [code, setCode] = useState<string>("");
     const [industry, setIndustry] = useState<string>("");
+    const [consolidationCat, setConsolidationCat] = useState<string>("");
 
     return (
         <Stack direction={'column'}>
@@ -32,8 +33,8 @@ const Default = (props: Props) => {
             <Box as='main'>
                 <Routes>
                     <Route path='/' element={<Home />} />
-                    <Route path='/view' element={<View setExplainId={setExplainId} setCode={setCode} />} />
-                    <Route path='/financialstate' element={<FinancialStateView explainId={explainId} code={code} industry={industry} setIndustry={setIndustry} />} />
+                    <Route path='/view' element={<View setExplainId={setExplainId} setCode={setCode} setConsolidationCat={setConsolidationCat} />} />
+                    <Route path='/financialstate' element={<FinancialStateView explainId={explainId} code={code} industry={industry} setIndustry={setIndustry} consolidationCat={consolidationCat} />} />
                 </Routes>
             </Box>
         </Stack>

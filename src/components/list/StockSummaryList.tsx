@@ -13,22 +13,34 @@ type Props = {
   code: string;
   setExplainId: React.Dispatch<React.SetStateAction<string>>;
   setCode: React.Dispatch<React.SetStateAction<string>>;
+  setConsolidationCat: React.Dispatch<React.SetStateAction<string>>;
 };
 
 const StockSummaryList = (props: Props) => {
-  const { code, setExplainId, setCode } = props;
+  const { code, setExplainId, setCode, setConsolidationCat } = props;
   const [data, setData] = useState<ExplainListDataItem[]>([]);
 
   const hundleClick = (item: ExplainListDataItem) => {
     setExplainId(item.id);
     setCode(item.code);
+    setConsolidationCat(item.consolidation_cat);
   }
 
-  useEffect(() => {
+  function allRecord(): void {
+    const list = new ExplainList();
+    ExplainListApi.fetchData(list, false)
+      .then(res => {
+        setData(res);
+        console.log(data);
+      })
+      .catch(error => console.log(error));
+  }
+
+  function selectCodeRecord(code: string): void {
     if (code !== "" && code.length === 4) {
       const list = new ExplainList();
       list.code = code;
-      ExplainListApi.fetchData(list)
+      ExplainListApi.fetchData(list, false)
         .then(res => {
           setData(res);
           console.log(data);
@@ -37,6 +49,19 @@ const StockSummaryList = (props: Props) => {
     }
     else {
       setData([]);
+    }
+  }
+
+  useEffect(() => {
+    allRecord();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (code !== "" && code.length === 4) {
+      selectCodeRecord(code);
+    } else if (code.length < 4) {
+      allRecord();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [code]);
@@ -66,6 +91,9 @@ const StockSummaryList = (props: Props) => {
                     <VStack>
                       <Text>
                         {item.publication_date}
+                      </Text>
+                      <Text>
+                        [{item.code}]
                       </Text>
                       <Text>
                         {item.company_name}

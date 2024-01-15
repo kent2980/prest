@@ -52,7 +52,7 @@ export const StockChartDataProvider: FC<Props> = ({ children }) => {
     const [params, setParams] = useState<StockChartParams>(new StockChartParams());
 
     const FetchData = useCallback((params: StockChartParams) => {
-        StockChartDataApi.fetchData(params.Record)
+        StockChartDataApi.fetchData(params.Record, true)
             .then(response => {
                 const dataSet: DataItem[] = response;
                 setData(dataSet);

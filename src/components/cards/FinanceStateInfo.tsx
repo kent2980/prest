@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Stat, StatArrow, StatGroup, StatHelpText, StatLabel, StatNumber, VStack } from '@chakra-ui/react';
-import { FinanceStateQuery, ContextMember, ContextScale, FinanceStateQueryBase, ReportDetailCat, UnitRef, FinanceStateQueryBK, ElementLabel, FinanceStateQueryIR } from '../../query/FinanceStateQuery';
+import { Box, Stat, StatArrow, StatGroup, StatHelpText, StatLabel, StatNumber, Text, VStack } from '@chakra-ui/react';
+import { ContextMember, ContextScale, FinanceStateQuery, ReportDetailCat, FinanceStateQueryBK, ElementLabel, FinanceStateQueryIR, UnitRef } from '../../query/FinanceStateQuery';
 import { ExplainItemApi, ExplainItemDataItem, ExplainItemParams } from '../../services/FsstockApiServies';
 
 type Props = {
     explainId: string;
     industry: string;
+    consolidationCat: string;
 }
 
 const FinancialStateInfo = (props: Props) => {
-    const { explainId, industry } = props;
-    const [items, setItems] = useState<FinanceStateQueryBase>();
+    const { explainId, industry, consolidationCat } = props;
+    const [items, setItems] = useState<FinanceStateQuery>();
 
-    function getQuery(response: ExplainItemDataItem[]): FinanceStateQueryBase {
+    function getQuery(response: ExplainItemDataItem[]): FinanceStateQuery {
+        console.log(industry);
         switch (industry) {
             case "7050":
                 return new FinanceStateQueryBK(response);
@@ -26,65 +28,89 @@ const FinancialStateInfo = (props: Props) => {
 
     }
 
-    function getItem(items: FinanceStateQueryBase, label: ElementLabel, unitRef: UnitRef): ExplainItemDataItem {
+    function getItem(items: FinanceStateQuery, label: ElementLabel): ExplainItemDataItem {
         const item = items.setContextMenber(ContextMember.RESULT_MEMBER)
             .setContextScale(ContextScale.CURRENT)
             .setElementLabel(label)
-            .setUnitref(unitRef)
             .setReportDetailCat(ReportDetailCat.SM)
-            .getItem()[0];
+            .setConsolidatedMember(consolidationCat)
+            .item[0];
 
         return item;
     }
 
-    useEffect(() => {
-        if (explainId !== "") {
-            const list = new ExplainItemParams();
-            list.explain = explainId;
-            list.current_context = true;
-            list.report_detail_cat = "sm"
-            ExplainItemApi.fetchData(list)
-                .then(res => {
-                    const states = getQuery(res);
-                    setItems(states);
-                })
+    function getNumeric(item: ExplainItemDataItem): number {
+        if (item) {
+            switch (item.unitref) {
+                case UnitRef.JPY:
+                    return parseInt(item.numeric);
+
+                case UnitRef.PURE:
+                case UnitRef.JPYPERSHARES:
+                case UnitRef.NUMBEROFCOMPANIES:
+                case UnitRef.SHARES:
+                    return parseFloat(item.numeric);
+
+                default:
+                    return parseInt(item.numeric);
+            }
         }
-    }, [explainId]);
+        return NaN;
+    }
+
+    useEffect(() => {
+        if (explainId && industry && consolidationCat) {
+            if (explainId !== "") {
+                const list = new ExplainItemParams();
+                list.explain = explainId;
+                list.current_context = true;
+                list.report_detail_cat = "sm"
+                ExplainItemApi.fetchData(list, true)
+                    .then(res => {
+                        const states = getQuery(res);
+                        setItems(states);
+                    })
+            }
+        }
+    }, [explainId, industry, consolidationCat]);
 
     return (
         <VStack>
+            <Box>
+                <Text>{explainId}</Text>
+            </Box>
             {items ?
                 <StatGroup w={{ base: 'calc(100vw - 10vw)', sm: '500px' }} border={'1px'} borderColor={'gray.300'} borderRadius={'10px'} padding={'10px'} >
                     <Stat>
                         <StatLabel>売上高</StatLabel>
-                        <StatNumber>{parseInt(getItem(items, ElementLabel.売上高, UnitRef.JPY)?.numeric ?? "").toLocaleString()}</StatNumber>
+                        <StatNumber>{getNumeric(getItem(items, ElementLabel.売上高))?.toLocaleString()}</StatNumber>
                         <StatHelpText>
-                            <StatArrow type={parseFloat(getItem(items, ElementLabel.売上高変化率, UnitRef.PURE)?.numeric ?? "") > 0 ? 'increase' : 'decrease'} />
-                            {parseFloat(getItem(items, ElementLabel.売上高変化率, UnitRef.PURE)?.numeric ?? "")}%
+                            <StatArrow type={getNumeric(getItem(items, ElementLabel.売上高変化率)) > 0 ? 'increase' : 'decrease'} />
+                            {getNumeric(getItem(items, ElementLabel.売上高変化率))}%
                         </StatHelpText>
                     </Stat>
                     <Stat>
                         <StatLabel>営業利益</StatLabel>
-                        <StatNumber>{parseInt(getItem(items, ElementLabel.営業利益, UnitRef.JPY)?.numeric ?? "").toLocaleString()}</StatNumber>
+                        <StatNumber>{getNumeric(getItem(items, ElementLabel.営業利益))?.toLocaleString().toLocaleString()}</StatNumber>
                         <StatHelpText>
-                            <StatArrow type={parseFloat(getItem(items, ElementLabel.営業利益変化率, UnitRef.PURE)?.numeric ?? "") > 0 ? 'increase' : 'decrease'} />
-                            {parseFloat(getItem(items, ElementLabel.営業利益変化率, UnitRef.PURE)?.numeric ?? "")}%
+                            <StatArrow type={getNumeric(getItem(items, ElementLabel.営業利益変化率)) > 0 ? 'increase' : 'decrease'} />
+                            {getNumeric(getItem(items, ElementLabel.営業利益変化率))}%
                         </StatHelpText>
                     </Stat>
                     <Stat>
                         <StatLabel>経常利益</StatLabel>
-                        <StatNumber>{parseInt(getItem(items, ElementLabel.経常利益, UnitRef.JPY)?.numeric ?? "").toLocaleString()}</StatNumber>
+                        <StatNumber>{getNumeric(getItem(items, ElementLabel.経常利益)).toLocaleString()}</StatNumber>
                         <StatHelpText>
-                            <StatArrow type={parseFloat(getItem(items, ElementLabel.経常利益変化率, UnitRef.PURE)?.numeric ?? "") > 0 ? 'increase' : 'decrease'} />
-                            {parseFloat(getItem(items, ElementLabel.経常利益変化率, UnitRef.PURE)?.numeric ?? "")}%
+                            <StatArrow type={getNumeric(getItem(items, ElementLabel.経常利益変化率)) > 0 ? 'increase' : 'decrease'} />
+                            {getNumeric(getItem(items, ElementLabel.経常利益変化率))}%
                         </StatHelpText>
                     </Stat>
                     <Stat>
                         <StatLabel>純利益</StatLabel>
-                        <StatNumber>{parseInt(getItem(items, ElementLabel.純利益, UnitRef.JPY)?.numeric ?? "").toLocaleString()}</StatNumber>
+                        <StatNumber>{getNumeric(getItem(items, ElementLabel.純利益)).toLocaleString()}</StatNumber>
                         <StatHelpText>
-                            <StatArrow type={parseFloat(getItem(items, ElementLabel.純利益変化率, UnitRef.PURE)?.numeric ?? "") > 0 ? 'increase' : 'decrease'} />
-                            {parseFloat(getItem(items, ElementLabel.純利益変化率, UnitRef.PURE)?.numeric ?? "")}%
+                            <StatArrow type={parseFloat(getItem(items, ElementLabel.純利益変化率)?.numeric ?? "") > 0 ? 'increase' : 'decrease'} />
+                            {getNumeric(getItem(items, ElementLabel.純利益変化率))}%
                         </StatHelpText>
                     </Stat>
                 </StatGroup>

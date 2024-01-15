@@ -8,10 +8,11 @@ type Props = {
     code: string;
     industry: string;
     setIndustry: React.Dispatch<React.SetStateAction<string>>;
+    consolidationCat: string;
 }
 
 const FinancialStateView = (props: Props) => {
-    const { explainId, code, industry, setIndustry } = props;
+    const { explainId, code, industry, setIndustry, consolidationCat } = props;
 
     return (
         <Center h="calc(100vh - 80px)">
@@ -20,7 +21,7 @@ const FinancialStateView = (props: Props) => {
                     <CompanyInfo code={code} setIndustry={setIndustry} />
                 ) : null}
                 {explainId ? (
-                    <FinancialStateInfo explainId={explainId} industry={industry} />
+                    <FinancialStateInfo explainId={explainId} industry={industry} consolidationCat={consolidationCat} />
                 ) : null}
             </VStack>
         </Center>
