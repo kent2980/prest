@@ -1,8 +1,8 @@
 import { HiDocumentDuplicate } from "react-icons/hi";
 import { Box, Button, Center, Text, VStack } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
-import { useEffect } from "react";
-import { useTodoContext } from "../context/StockApiContext";
+import { useContext, useEffect, useState } from "react";
+import { TodoContext, useContentContext, useTodoContext } from "../context/TodoContext";
 
 type Props = {
   setCode: React.Dispatch<React.SetStateAction<string>>;
@@ -10,7 +10,9 @@ type Props = {
 
 const Home = (props: Props) => {
 
-  const [todos, setTodos] = useTodoContext();
+  const { todos, setTodos } = useTodoContext();
+
+  const { content, setContent } = useContentContext();
 
   const { setCode } = props;
 
@@ -33,7 +35,7 @@ const Home = (props: Props) => {
           </Button>
         </Link>
         <Box>
-          <Text>{todos}</Text>
+          {todos[0].content}
         </Box>
       </VStack>
     </Center >

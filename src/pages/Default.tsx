@@ -1,10 +1,11 @@
 import { Box, Flex, Stack } from '@chakra-ui/react';
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import MainHeader from '../components/headers/MainHeader';
 import { Route, Routes } from 'react-router-dom';
 import Home from './Home';
 import View from './View';
 import FinancialStateView from './FinancialStateView';
+import { ExplainListContext } from '../context/XbrlDataContext';
 
 type Props = {}
 
@@ -13,6 +14,8 @@ const Default = (props: Props) => {
     const [code, setCode] = useState<string>("");
     const [industry, setIndustry] = useState<string>("");
     const [consolidationCat, setConsolidationCat] = useState<string>("");
+
+    const { explain } = useContext(ExplainListContext)
 
     return (
         <Stack direction={'column'}>
