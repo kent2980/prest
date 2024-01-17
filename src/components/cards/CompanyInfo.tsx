@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { StockBrandsApi, StockBrandsData, StockBrandsParams } from '../../services/FsstockApiServies';
-import { Box, Text, VStack } from '@chakra-ui/react';
+import { Box, Grid, GridItem, Heading, Text, VStack } from '@chakra-ui/react';
 
 type Props = {
     code: string;
@@ -33,15 +33,27 @@ const CompanyInfo = (props: Props) => {
     }, [item]);
 
     return (
-        <Box>
-            {item ? (
-                <VStack>
-                    <Text>{item.security_name}</Text >
-                    <Text>銘柄コード:{item.code}</Text>
-                    <Text>業種コード:{item.number_33_industry_code}</Text>
-                    <Text>{item.number_33_industry_category}</Text>
-                </VStack>
-            ) : null}
+        <Box border={'1px'} borderColor={'red.300'}>
+            <Grid templateAreas={`"code title title title"
+                            "market market sector sector"`}
+                gridTemplateRows={'50px 30px'}
+                gridTemplateColumns={'60px 1fr 200px 1fr'}
+                gap='1'
+                color='blackAlpha.700'
+            >
+                <GridItem pl='2' w='50px' area={'code'}>
+                    <Text>{item?.code}</Text>
+                </GridItem>
+                <GridItem pl='2' area={'title'}>
+                    <Heading mb={4} as='h2' size='xl' fontSize='20px'>{item?.security_name}</Heading>
+                </GridItem>
+                <GridItem pl='2' area={'market'}>
+                    <Text>{item?.market_product_category}</Text>
+                </GridItem>
+                <GridItem pl='2' area={'sector'}>
+                    <Text>{item?.number_33_industry_category}</Text>
+                </GridItem>
+            </Grid>
         </Box>
     )
 }

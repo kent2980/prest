@@ -76,9 +76,6 @@ const FinancialStateInfo = (props: Props) => {
 
     return (
         <VStack>
-            <Box>
-                <Text>{explainId}</Text>
-            </Box>
             {items ?
                 <StatGroup w={{ base: 'calc(100vw - 10vw)', sm: '500px' }} border={'1px'} borderColor={'gray.300'} borderRadius={'10px'} padding={'10px'} >
                     <Stat>

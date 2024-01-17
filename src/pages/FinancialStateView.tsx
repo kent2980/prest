@@ -1,5 +1,5 @@
 import React from 'react';
-import { Center, VStack } from '@chakra-ui/react';
+import { Center, VStack, Box } from '@chakra-ui/react';
 import FinancialStateInfo from '../components/cards/FinanceStateInfo';
 import CompanyInfo from '../components/cards/CompanyInfo';
 
@@ -15,16 +15,20 @@ const FinancialStateView = (props: Props) => {
     const { explainId, code, industry, setIndustry, consolidationCat } = props;
 
     return (
-        <Center h="calc(100vh - 80px)">
-            <VStack spacing={10}>
-                {code ? (
+        <Box>
+            {code ? (
+                <VStack>
                     <CompanyInfo code={code} setIndustry={setIndustry} />
-                ) : null}
-                {explainId ? (
-                    <FinancialStateInfo explainId={explainId} industry={industry} consolidationCat={consolidationCat} />
-                ) : null}
-            </VStack>
-        </Center>
+                    <Center h="calc(100vh - 80px)">
+                        <VStack spacing={10}>
+                            {explainId ? (
+                                <FinancialStateInfo explainId={explainId} industry={industry} consolidationCat={consolidationCat} />
+                            ) : null}
+                        </VStack>
+                    </Center>
+                </VStack>
+            ) : null}
+        </Box>
     )
 }
 
