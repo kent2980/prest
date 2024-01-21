@@ -39,6 +39,19 @@ export class FsstockApiServiesBase {
         return this;
     }
 
+    get params(): Record<string, any> | null {
+        return this._params;
+    }
+
+    public setParams(params: Record<string, any>): this {
+        this._params = params;
+        return this;
+    }
+
+    get requestUrl(): string | null {
+        return this._requestUrl;
+    }
+
     public setRequestUrl() {
         // API URLを生成
         const url: string = `${this._baseUrl}${this._endPass}`;
