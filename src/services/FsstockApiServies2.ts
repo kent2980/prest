@@ -72,11 +72,6 @@ export class FsstockApiServiesBase {
         return this._apiData;
     }
 
-    async *[Symbol.asyncIterator]() {
-        while (this._requestUrl) {
-            yield this.callApi();
-        }
-    }
 }
 
 export class FsstockApiServies extends FsstockApiServiesBase {
