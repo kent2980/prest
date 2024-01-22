@@ -1,4 +1,5 @@
 import axios from "axios";
+import { FsstockParamsBase } from "./apiParams/FsstockParams";
 
 export enum EndPath {
     EXPLAIN = "explain",
@@ -7,13 +8,13 @@ export enum EndPath {
     RESULT = "result",
 }
 
-export class FsstockApiServiesBase {
+export class FsstockApiServiesBase<T> {
 
     private _baseUrl: string;
     private _endPass: EndPath | null;
-    private _params: Record<string, any> | null;
+    private _params: FsstockParamsBase | null;
     private _requestUrl: string | null = null;
-    private _apiData: any | null = null;
+    private _apiData: T | null = null;
 
     constructor(baseUrl: string, endPath: EndPath | null = null, params: Record<string, any> | null = null) {
         this._baseUrl = baseUrl;
@@ -39,11 +40,11 @@ export class FsstockApiServiesBase {
         return this;
     }
 
-    get params(): Record<string, any> | null {
+    get params(): FsstockParamsBase | null {
         return this._params;
     }
 
-    public setParams(params: Record<string, any>): this {
+    public setParams(params: FsstockParamsBase): this {
         this._params = params;
         return this;
     }
@@ -67,12 +68,14 @@ export class FsstockApiServiesBase {
         }
     }
 
-    public async callApi(): Promise<any> {
+    public async feachData(): Promise<any> {
         try {
             if (this._requestUrl) {
-                const response = await axios.get(this._requestUrl);
-                this._apiData = response.data;
-                this._requestUrl = this._apiData?.next;
+                await axios.get(this._requestUrl)
+                .then(res=>{
+                    this._apiData = res.data;
+                    this._requestUrl = res.data.next;
+                });
             }
         } catch (er) {
             console.error(er);
