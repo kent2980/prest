@@ -8,13 +8,13 @@ export enum EndPath {
     RESULT = "result",
 }
 
-export class FsstockApiServiesBase<T> {
+export class FsstockApiServiesBase {
 
     private _baseUrl: string;
     private _endPass: EndPath | null;
     private _params: FsstockParamsBase | null;
     private _requestUrl: string | null = null;
-    private _apiData: T | null = null;
+    private _apiData: Record<string, any> | null = null;
 
     constructor(baseUrl: string, endPath: EndPath | null = null, params: Record<string, any> | null = null) {
         this._baseUrl = baseUrl;
@@ -72,10 +72,10 @@ export class FsstockApiServiesBase<T> {
         try {
             if (this._requestUrl) {
                 await axios.get(this._requestUrl)
-                .then(res=>{
-                    this._apiData = res.data;
-                    this._requestUrl = res.data.next;
-                });
+                    .then(res => {
+                        this._apiData = res.data;
+                        this._requestUrl = res.data.next;
+                    });
             }
         } catch (er) {
             console.error(er);
